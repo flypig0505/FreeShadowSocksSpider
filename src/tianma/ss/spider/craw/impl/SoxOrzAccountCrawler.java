@@ -126,6 +126,7 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 	public List<Config> crawAccounts() {
 		System.out.println(ROOT_URL);
 		boolean needSpiltLine = false;
+		boolean needParse = false; // 是否有必要继续解析
 		for (SoxOrzAccount account : accounts) {
 			if (needSpiltLine) {
 				System.out.println("\n");
@@ -139,14 +140,19 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 				System.out.println("Login Failed");
 				continue;
 			}
+			needParse = true;
 			System.out.println("Login Success");
 			// 签到
 			checkin();
 		}
 
-		List<String> urls = parseAllNodeUrl();
+		List<Config> configs = new ArrayList<Config>();
+		if (needParse) {
+			List<String> urls = parseAllNodeUrl();
+			configs = parseAllConfigs(urls);
+		} 
 		System.out.println("-----------------------------");
-		return parseAllConfigs(urls);
+		return configs;
 	}
 
 	/**

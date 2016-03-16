@@ -24,6 +24,7 @@ import com.google.gson.JsonSyntaxException;
 
 import tianma.ss.spider.craw.AccountCrawler;
 import tianma.ss.spider.craw.impl.FreeVPNSSAccountCrawler;
+import tianma.ss.spider.craw.impl.GetShadowSocksAccountCrawler;
 import tianma.ss.spider.craw.impl.IShadowSocksAccountCrawler;
 import tianma.ss.spider.craw.impl.SoxOrzAccountCrawler;
 import tianma.ss.spider.model.Config;
@@ -46,6 +47,7 @@ public class ShadowSocksSpider {
 		{
 			this.add(new FreeVPNSSAccountCrawler());
 			this.add(new IShadowSocksAccountCrawler());
+			this.add(new GetShadowSocksAccountCrawler());
 			this.add(new SoxOrzAccountCrawler());
 		}
 	};
