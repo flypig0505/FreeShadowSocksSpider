@@ -1,0 +1,122 @@
+package tianma.ss.spider.model;
+
+import java.util.List;
+
+import com.google.gson.Gson;
+
+/**
+ * ShadowSocks gui-config.json中的配置
+ * 
+ * @author Tianma
+ *
+ */
+public class ShadowSocksConfig {
+
+	private List<Config> configs;
+	private String strategy;
+	private int index;
+	private boolean global;
+	private boolean enabled;
+	private boolean shareOverLan;
+	private boolean isDefault;
+	private int localPort;
+	private String pacUrl;
+	private boolean useOnlinePac;
+	private boolean availabilityStatistics;
+
+	public List<Config> getConfigs() {
+		return configs;
+	}
+
+	public void setConfigs(List<Config> configs) {
+		this.configs = configs;
+	}
+
+	public String getStrategy() {
+		return strategy;
+	}
+
+	public void setStrategy(String strategy) {
+		this.strategy = strategy;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public boolean isGlobal() {
+		return global;
+	}
+
+	public void setGlobal(boolean global) {
+		this.global = global;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public boolean isShareOverLan() {
+		return shareOverLan;
+	}
+
+	public void setShareOverLan(boolean shareOverLan) {
+		this.shareOverLan = shareOverLan;
+	}
+
+	public boolean isDefault() {
+		return isDefault;
+	}
+
+	public void setDefault(boolean isDefault) {
+		this.isDefault = isDefault;
+	}
+
+	public int getLocalPort() {
+		return localPort;
+	}
+
+	public void setLocalPort(int localPort) {
+		this.localPort = localPort;
+	}
+
+	public String getPacUrl() {
+		return pacUrl;
+	}
+
+	public void setPacUrl(String pacUrl) {
+		this.pacUrl = pacUrl;
+	}
+
+	public boolean isUseOnlinePac() {
+		return useOnlinePac;
+	}
+
+	public void setUseOnlinePac(boolean useOnlinePac) {
+		this.useOnlinePac = useOnlinePac;
+	}
+
+	public boolean isAvailabilityStatistics() {
+		return availabilityStatistics;
+	}
+
+	public void setAvailabilityStatistics(boolean availabilityStatistics) {
+		this.availabilityStatistics = availabilityStatistics;
+	}
+
+	@Override
+	public String toString() {
+		Gson gson = new Gson();
+		String result = gson.toJson(this);
+		return result;
+	}
+
+}
