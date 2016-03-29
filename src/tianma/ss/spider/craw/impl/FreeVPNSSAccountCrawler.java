@@ -60,6 +60,8 @@ public class FreeVPNSSAccountCrawler implements AccountCrawler {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			try {
 				httpClient.close();

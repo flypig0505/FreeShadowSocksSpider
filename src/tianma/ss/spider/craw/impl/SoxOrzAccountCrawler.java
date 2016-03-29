@@ -150,7 +150,7 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 		if (needParse) {
 			List<String> urls = parseAllNodeUrl();
 			configs = parseAllConfigs(urls);
-		} 
+		}
 		System.out.println("-----------------------------");
 		return configs;
 	}
@@ -276,6 +276,8 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
