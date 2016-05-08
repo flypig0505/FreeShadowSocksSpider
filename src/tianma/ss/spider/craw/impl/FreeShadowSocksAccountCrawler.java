@@ -39,7 +39,6 @@ public class FreeShadowSocksAccountCrawler implements AccountCrawler{
 			HttpResponse response = httpClient.execute(httpGet);
 			HttpEntity entity = response.getEntity();
 			String html = EntityUtils.toString(entity, "utf-8");
-			System.out.println(html);
 			Document doc = Jsoup.parse(html);
 			Elements accounts = doc.getElementsByClass("col-md-6");
 			for (Element account : accounts) {
