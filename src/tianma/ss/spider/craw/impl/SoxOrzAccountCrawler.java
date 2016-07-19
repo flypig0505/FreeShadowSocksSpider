@@ -54,7 +54,7 @@ import tianma.ss.spider.util.TextUtils;
  */
 public class SoxOrzAccountCrawler implements AccountCrawler {
 
-	public static final String ROOT_URL = "http://ss.yearn.cc/user/";
+	public static final String ROOT_URL = "http://www.vwp123.com/user/";
 	public static final String HREF_PREFIX = "node_json.php";
 
 	private CookieStoreManager cookieStoreManager;
