@@ -29,7 +29,8 @@ import tianma.ss.spider.util.TextUtils;
 public class FreeVPNSSAccountCrawler implements AccountCrawler {
 
 	// private static String url = "https://www.freevpnss.net/";
-	private static String url = "http://i.freevpnss.com/";
+	// private static String url = "http://i.freevpnss.com/";
+	private static String url = "http://freevpnss.cc/";
 
 	@Override
 	public List<Config> crawAccounts() {
