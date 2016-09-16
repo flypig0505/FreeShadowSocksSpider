@@ -154,8 +154,6 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 			}
 			
 		}
-
-		System.out.println("-----------------------------");
 		return configs;
 	}
 
@@ -327,5 +325,10 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 			e.printStackTrace();
 		}
 		return configs;
+	}
+
+	@Override
+	public String getUrl() {
+		return ROOT_URL;
 	}
 }

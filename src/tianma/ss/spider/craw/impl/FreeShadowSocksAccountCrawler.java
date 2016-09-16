@@ -31,7 +31,6 @@ public class FreeShadowSocksAccountCrawler implements AccountCrawler{
 	
 	@Override
 	public List<Config> crawAccounts() {
-		System.out.println(url);
 		List<Config> configs = new ArrayList<Config>();
 		CloseableHttpClient httpClient = HttpClientsProxy.createSSLClientDefault();
 		try {
@@ -68,7 +67,6 @@ public class FreeShadowSocksAccountCrawler implements AccountCrawler{
 				e.printStackTrace();
 			}
 		}
-		System.out.println("-----------------------------");
 		return configs;
 	}
 
@@ -77,6 +75,11 @@ public class FreeShadowSocksAccountCrawler implements AccountCrawler{
 			return null;
 		int index = str.indexOf(':');
 		return str.substring(index + 1);
+	}
+
+	@Override
+	public String getUrl() {
+		return url;
 	}
 	
 }

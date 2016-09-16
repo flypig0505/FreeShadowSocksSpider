@@ -19,6 +19,12 @@ public interface AccountCrawler {
 	 * 
 	 * @return
 	 */
-	public List<Config> crawAccounts();
+	List<Config> crawAccounts();
+	
+	/**
+	 * 获取ShadowSocks爬虫页面URL
+	 * @return
+	 */
+	String getUrl();
 
 }

@@ -107,7 +107,14 @@ public class ShadowSocksSpider {
 	public void start() {
 		List<Config> configs = new ArrayList<Config>();
 		for (AccountCrawler crawler : crawlers) {
-			configs.addAll(crawler.crawAccounts());
+			System.out.println(crawler.getUrl());
+			List<Config> newConfigs = crawler.crawAccounts();
+			if (newConfigs == null || newConfigs.isEmpty()) {
+				System.out.println("Cannot parse any ShadowSocks accounts from this page!");
+			} else {
+				configs.addAll(newConfigs);
+			}
+			System.out.println("-----------------------------");
 		}
 		// 判断当前Shadowsocks.exe是否正在运行
 		List<Integer> pids = getShadowSocksPidList();

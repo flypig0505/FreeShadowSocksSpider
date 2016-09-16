@@ -18,19 +18,20 @@ import org.jsoup.select.Elements;
 
 import tianma.ss.spider.craw.AccountCrawler;
 import tianma.ss.spider.model.Config;
+import tianma.ss.spider.util.TextUtils;
 
 /**
  * getshadowsocks ss账户爬取
+ * 
  * @author Tianma
  *
  */
 public class GetShadowSocksAccountCrawler implements AccountCrawler {
 
 	private static String url = "http://getshadowsocks.com/";
-	
+
 	@Override
 	public List<Config> crawAccounts() {
-		System.out.println(url);
 		List<Config> configs = new ArrayList<Config>();
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
@@ -40,13 +41,18 @@ public class GetShadowSocksAccountCrawler implements AccountCrawler {
 			HttpEntity entity = response.getEntity();
 			String html = EntityUtils.toString(entity, "utf-8");
 			Document doc = Jsoup.parse(html);
-			Element panelEle = doc.getElementsByClass("panel").first();
-			if (panelEle != null) {
-				Elements eles = panelEle.getElementsByTag("input");
-				String server = eles.get(0).attr("value");
-				int port = Integer.parseInt(eles.get(1).attr("value"));
-				String password = eles.get(2).attr("value");
-				String method = eles.get(3).attr("value");
+			Elements sections = doc.getElementsByTag("section");
+			for (Element section: sections) {
+				Elements eles = section.getElementsByTag("p");
+				int port = 0;
+				try {
+					port = Integer.parseInt(getString(eles.get(1).text()));
+				} catch (Exception ignore) {
+					continue;
+				}
+				String server = getString(eles.get(0).text());
+				String password = getString(eles.get(2).text());
+				String method = getString(eles.get(3).text());
 				configs.add(new Config(server, port, password, method, ""));
 			}
 		} catch (ClientProtocolException e) {
@@ -55,15 +61,26 @@ public class GetShadowSocksAccountCrawler implements AccountCrawler {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			try {
 				httpClient.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("-----------------------------");
 		return configs;
+	}
+	
+	private String getString(String str) {
+		if (TextUtils.isEmpty(str))
+			return null;
+		int index = str.indexOf(':');
+		return str.substring(index + 1);
+	}
+
+	@Override
+	public String getUrl() {
+		return url;
 	}
 
 }
