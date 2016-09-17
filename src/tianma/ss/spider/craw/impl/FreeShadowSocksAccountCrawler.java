@@ -22,13 +22,15 @@ import tianma.ss.spider.util.TextUtils;
 
 /**
  * free shadowsocks 账户爬取
+ * 
  * @author Tianma
  *
  */
-public class FreeShadowSocksAccountCrawler implements AccountCrawler{
+public class FreeShadowSocksAccountCrawler implements AccountCrawler {
 
-	private static String url = "http://freeshadowsocks.cf/";
-	
+	// private static String url = "http://freeshadowsocks.cf/";
+	private static String url = "http://freessr.cf/";
+
 	@Override
 	public List<Config> crawAccounts() {
 		List<Config> configs = new ArrayList<Config>();
@@ -81,5 +83,5 @@ public class FreeShadowSocksAccountCrawler implements AccountCrawler{
 	public String getUrl() {
 		return url;
 	}
-	
+
 }
