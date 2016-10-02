@@ -29,7 +29,8 @@ import tianma.ss.spider.util.TextUtils;
 public class FreeShadowSocksAccountCrawler implements AccountCrawler {
 
 	// private static String url = "http://freeshadowsocks.cf/";
-	private static String url = "http://freessr.cf/";
+	// private static String url = "http://freessr.cf/";
+	private static String url = "http://freessr.top/";
 
 	@Override
 	public List<Config> crawAccounts() {
