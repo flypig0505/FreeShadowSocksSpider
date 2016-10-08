@@ -28,7 +28,8 @@ import tianma.ss.spider.util.TextUtils;
  */
 public class IShadowSocksAccountCrawler implements AccountCrawler {
 
-	private static String url = "http://www.ishadowsocks.net/";
+	// private static String url = "http://www.ishadowsocks.net/";
+	private static String url = "http://www.ishadowsocks.org/";
 
 	@Override
 	public List<Config> crawAccounts() {
@@ -42,13 +43,14 @@ public class IShadowSocksAccountCrawler implements AccountCrawler {
 			String html = EntityUtils.toString(entity, "utf-8");
 			Document doc = Jsoup.parse(html);
 			Element freeEle = doc.getElementById("free");
-			Elements accounts = freeEle.getElementsByClass("col-lg-4");
+			Elements accounts = freeEle.getElementsByClass("col-sm-4");
 			for (Element account : accounts) {
 				Elements eles = account.getElementsByTag("h4");
 				int port = 0;
 				try {
 					port = Integer.parseInt(getString(eles.get(1).text()));
 				} catch (Exception ignore) {
+					ignore.printStackTrace();
 					continue;
 				}
 				String server = getString(eles.get(0).text());
@@ -57,7 +59,6 @@ public class IShadowSocksAccountCrawler implements AccountCrawler {
 				String method = getString(eles.get(3).text());
 				configs.add(new Config(server, port, password, method, ""));
 			}
-
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

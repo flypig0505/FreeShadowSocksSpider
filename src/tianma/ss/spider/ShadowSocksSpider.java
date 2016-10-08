@@ -34,7 +34,7 @@ import tianma.ss.spider.model.ShadowSocksConfig;
 import tianma.ss.spider.util.TextUtils;
 
 /**
- * This is a web crawler the node data associated with shadowsocks
+ * This is a web crawler which can grab the related shadowsocks's node information.
  * 
  * @author Tianma
  * @Date: 2016年1月5日 上午12:34:30
