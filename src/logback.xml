@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property name="LogPath" value="D:\\ShadowSocks\\FreeShadowSocksSpider\\log"/>
+	<property name="MaxHistory" value="30"/>
+	
+	<appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d [%thread] %level %class %method : %message%n</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="RollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LogPath}/%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>${MaxHistory}</maxHistory>
+		</rollingPolicy>
+		
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:dd.SSS} [%thread] %level %logger : %message%n%ex{full, DISPLAY_EX_EVAL}</pattern>
+		</encoder>
+		
+	</appender>
+	
+	<logger name="ShadowSocksSpiderLogger" level="TRACE" additivity="false">
+		<appender-ref ref="ConsoleAppender"/>
+		<appender-ref ref="RollingFileAppender"/>
+	</logger>
+	
+</configuration>
