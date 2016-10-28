@@ -3,10 +3,13 @@
 
 	<property name="LogPath" value="D:\\ShadowSocks\\FreeShadowSocksSpider\\log"/>
 	<property name="MaxHistory" value="30"/>
+	<property name="ConsoleCharset" value="GB2312"/>
+	<property name="FileCharset" value="UTF-8"/>
 	
 	<appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{yyyy-MM-dd HH:mm:dd.SSS} [%thread] %level : %message%n</pattern>
+			<charset>${ConsoleCharset}</charset>
 		</encoder>
 	</appender>
 	
@@ -19,6 +22,7 @@
 		
 		<encoder>
 			<pattern>%d{yyyy-MM-dd HH:mm:dd.SSS} [%thread] %level : %message%n%ex{full, DISPLAY_EX_EVAL}</pattern>
+			<charset>${FileCharset}</charset>
 		</encoder>
 		
 	</appender>
