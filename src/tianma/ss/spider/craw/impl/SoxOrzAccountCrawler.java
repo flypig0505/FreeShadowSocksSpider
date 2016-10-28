@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,6 +43,7 @@ import tianma.ss.spider.model.Config;
 import tianma.ss.spider.model.SoxOrzAccount;
 import tianma.ss.spider.model.SoxOrzLoginStatus;
 import tianma.ss.spider.util.CharacterUtil;
+import tianma.ss.spider.util.TLog;
 import tianma.ss.spider.util.TextUtils;
 
 /**
@@ -116,7 +116,7 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 			// 随机乱序,让各个账号都有机会使用
 			Collections.shuffle(accounts);
 		} catch (IOException e) {
-			System.out.println("初始化失败,请检查SoxOrzAccount*.properties配置文件");
+			TLog.e("初始化失败,请检查SoxOrzAccount*.properties配置文件");
 			// 初始化失败,抛出异常
 			throw new ExceptionInInitializerError(e);
 		}
@@ -124,35 +124,35 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 
 	@Override
 	public List<Config> crawAccounts() {
-		System.out.println(ROOT_URL);
+		TLog.i(ROOT_URL);
 		boolean needSpiltLine = false;
 		boolean needParse = false; // 是否有必要继续解析
-		
+
 		List<Config> configs = new ArrayList<Config>();
-		
+
 		for (SoxOrzAccount account : accounts) {
 			if (needSpiltLine) {
-				System.out.println("\n");
+				TLog.i("");
 			} else {
 				needSpiltLine = true;
 			}
-			System.out.println("Current email : " + account.getEmail());
+			TLog.i("Current email : " + account.getEmail());
 			// 登陆
 			boolean loginSuccess = login(account);
 			if (!loginSuccess) {
-				System.out.println("Login Failed");
+				TLog.i("Login Failed");
 				continue;
 			}
 			needParse = true;
-			System.out.println("Login Success");
+			TLog.i("Login Success");
 			// 签到
 			checkin();
-			
+
 			if (needParse) {
 				List<String> urls = parseAllNodeUrl();
 				configs.addAll(parseAllConfigs(urls));
 			}
-			
+
 		}
 		return configs;
 	}
@@ -186,19 +186,15 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 				cookieStoreManager.setCookieStore(cookieStore);
 				return true;
 			} else {
-				System.out.println(loginStatus.getMsg());
+				TLog.i(loginStatus.getMsg());
 			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			TLog.e("", e);
 		} finally {
 			try {
 				httpClient.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				TLog.e("Close httpclient failed", e);
 			}
 		}
 		return false;
@@ -234,13 +230,12 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 				break;
 			}
 			if (hasDigit) {
-				System.out.println("签到成功," + msg);
+				TLog.i("签到成功," + msg);
 			} else {
-				System.out.println("重复签到," + msg);
+				TLog.w("重复签到," + msg);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("签到失败");
+			TLog.e("签到失败", e);
 		}
 		return result;
 	}
@@ -275,17 +270,13 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 					}
 				}
 			}
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+			TLog.e("Parse all node url failed", e);
 		} finally {
 			try {
 				httpClient.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				TLog.e("Close httpclient failed", e);
 			}
 		}
 		return nodeUrls;
@@ -322,7 +313,7 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			TLog.e("Parse all configs failed", e);
 		}
 		return configs;
 	}

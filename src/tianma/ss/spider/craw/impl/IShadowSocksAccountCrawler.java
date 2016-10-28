@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -18,6 +17,7 @@ import org.jsoup.select.Elements;
 
 import tianma.ss.spider.craw.AccountCrawler;
 import tianma.ss.spider.model.Config;
+import tianma.ss.spider.util.TLog;
 import tianma.ss.spider.util.TextUtils;
 
 /**
@@ -50,7 +50,6 @@ public class IShadowSocksAccountCrawler implements AccountCrawler {
 				try {
 					port = Integer.parseInt(getString(eles.get(1).text()));
 				} catch (Exception ignore) {
-					ignore.printStackTrace();
 					continue;
 				}
 				String server = getString(eles.get(0).text());
@@ -59,17 +58,13 @@ public class IShadowSocksAccountCrawler implements AccountCrawler {
 				String method = getString(eles.get(3).text());
 				configs.add(new Config(server, port, password, method, ""));
 			}
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
-			e.printStackTrace();
+			TLog.e("Craw ss accounts failed", e);
 		} finally {
 			try {
 				httpClient.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				TLog.e("Close httpclient failed", e);
 			}
 		}
 		return configs;

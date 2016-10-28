@@ -3,7 +3,6 @@ package tianma.ss.spider;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -19,8 +18,6 @@ import org.apache.commons.io.FileUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 
 import tianma.ss.spider.craw.AccountCrawler;
 import tianma.ss.spider.craw.impl.FreeShadowSocksAccountCrawler;
@@ -31,6 +28,7 @@ import tianma.ss.spider.craw.impl.SoxOrzAccountCrawler;
 import tianma.ss.spider.model.Config;
 import tianma.ss.spider.model.SSProgramConfig;
 import tianma.ss.spider.model.ShadowSocksConfig;
+import tianma.ss.spider.util.TLog;
 import tianma.ss.spider.util.TextUtils;
 
 /**
@@ -85,7 +83,7 @@ public class ShadowSocksSpider {
 				break;
 			}
 		} catch (IOException e) {
-			System.out.println("初始化失败,请检查SoxOrzAccount*.properties配置文件");
+			TLog.e("初始化失败,请检查SoxOrzAccount*.properties配置文件");
 			// 初始化失败,抛出异常
 			throw new ExceptionInInitializerError(e);
 		}
@@ -105,37 +103,39 @@ public class ShadowSocksSpider {
 	 * @throws Exception
 	 */
 	public void start() {
+		TLog.i("----------------------------------Start----------------------------------");
 		List<Config> configs = new ArrayList<Config>();
 		for (AccountCrawler crawler : crawlers) {
-			System.out.println(crawler.getUrl());
+			TLog.i(crawler.getUrl());
 			List<Config> newConfigs = crawler.crawAccounts();
 			if (newConfigs == null || newConfigs.isEmpty()) {
-				System.out.println("Cannot parse any ShadowSocks accounts from this page!");
+				TLog.w("Cannot parse any ShadowSocks accounts from this page!");
 			} else {
 				configs.addAll(newConfigs);
 			}
-			System.out.println("-----------------------------");
+			TLog.i("-----------------------------");
 		}
 		// 判断当前Shadowsocks.exe是否正在运行
 		List<Integer> pids = getShadowSocksPidList();
 		boolean running = pids.size() > 0;
 		if (running) {
-			System.out.println("ShadowSocks is running");
+			TLog.i("ShadowSocks is running");
 			// 杀死当前系统中的ShadowSocks进程
 			taskKill(pids);
-			System.out.println("Kill shadowsocks processes successful");
+			TLog.i("Kill shadowsocks processes successful");
 			// 将节点写入到gui-config.json文件中去
 			writeToGUIConfig(configs);
-			System.out.println("Write node to config file successful");
+			TLog.i("Write node to config file successful");
 			// 再次启动ShadowSocks进程
 			startShadowSocks();
-			System.out.println("Restart shadowsocks program successful");
+			TLog.i("Restart shadowsocks program successful");
 		} else {
-			System.out.println("ShadowSocks is not running");
+			TLog.i("ShadowSocks is not running");
 			// 将节点写入到gui-config.json文件中去
 			writeToGUIConfig(configs);
-			System.out.println("Write node to config file successful");
+			TLog.i("Write node to config file successful");
 		}
+		TLog.i("----------------------------------End----------------------------------\n");
 	}
 
 	/**
@@ -153,15 +153,9 @@ public class ShadowSocksSpider {
 			String data = gson.toJson(ssConfig);
 			FileUtils.write(configPath, data);
 			result = true;
-		} catch (JsonSyntaxException e) {
-			e.printStackTrace();
-		} catch (JsonIOException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			TLog.e("Write to gui-config.json failed", e);
+		} 
 		return result;
 	}
 
@@ -184,7 +178,7 @@ public class ShadowSocksSpider {
 			while ((line = br.readLine()) != null) {
 				line = line.replaceAll("\"", "");
 				if (line.toLowerCase().contains(exeNameLower)) {
-					System.out.println(line);
+					TLog.i(line);
 					String[] splits = line.split(",");
 					try {
 						int pid = Integer.parseInt(splits[1]);
@@ -195,8 +189,8 @@ public class ShadowSocksSpider {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
+			TLog.e("Get ShadowSocks.exe's process ID failed", e);
+		}  finally {
 			if (p != null)
 				p.destroy();
 		}
@@ -220,18 +214,16 @@ public class ShadowSocksSpider {
 		}
 		cmdBuilder.append(" /T");
 		String cmd = cmdBuilder.toString();
-		System.out.println(cmd);
+		TLog.i(cmd);
 		Process p = null;
 		try {
 			p = Runtime.getRuntime().exec(cmd);
 			// 睡眠,等待ShadowSocks进程关闭
 			int waiting = 3;
-			System.out.println("Waiting " + waiting + " seconds to shut up ShadowSocks");
+			TLog.i("Waiting for " + waiting + " seconds to shut up ShadowSocks");
 			TimeUnit.SECONDS.sleep(waiting);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			TLog.e(e);
 		} finally {
 			if (p != null)
 				p.destroy();
@@ -247,7 +239,7 @@ public class ShadowSocksSpider {
 			String cmd = shadowSocks.getAbsolutePath();
 			Runtime.getRuntime().exec(cmd);
 		} catch (IOException e) {
-			e.printStackTrace();
+			TLog.e(e);
 		}
 	}
 

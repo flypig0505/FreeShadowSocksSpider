@@ -16,6 +16,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 
+import tianma.ss.spider.util.TLog;
+
 /**
  * This is a proxy of  {@link HttpClients}
  * @author Tianma
@@ -82,11 +84,11 @@ public class HttpClientsProxy {
 			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext);
 			return HttpClients.custom().setSSLSocketFactory(sslsf).build();
 		} catch (KeyManagementException e) {
-			e.printStackTrace();
+			TLog.e(e);
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			TLog.e(e);
 		} catch (KeyStoreException e) {
-			e.printStackTrace();
+			TLog.e(e);
 		}
 		return HttpClients.createDefault();
 	}

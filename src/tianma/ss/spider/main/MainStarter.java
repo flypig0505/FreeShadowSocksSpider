@@ -6,6 +6,7 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import tianma.ss.spider.ShadowSocksSpider;
+import tianma.ss.spider.util.TLog;
 
 /**
  * The main entrance
@@ -21,6 +22,7 @@ public class MainStarter {
 	private static final String MODE_CIRCLE = "circle";
 
 	public static void main(String[] args) {
+		TLog.init();
 		String mode;
 		if (args.length <= 0) {
 			System.out.println("用法： [mode]");
@@ -29,8 +31,7 @@ public class MainStarter {
 			System.out.println("circle 循环执行(每6小时执行一次)");
 			try {
 				TimeUnit.SECONDS.sleep(5);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			} catch (InterruptedException ignore) {
 			}
 			System.exit(0);
 		}

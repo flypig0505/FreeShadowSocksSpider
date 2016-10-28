@@ -6,7 +6,7 @@
 	
 	<appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d [%thread] %level %class %method : %message%n</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:dd.SSS} [%thread] %level : %message%n</pattern>
 		</encoder>
 	</appender>
 	
@@ -18,7 +18,7 @@
 		</rollingPolicy>
 		
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:dd.SSS} [%thread] %level %logger : %message%n%ex{full, DISPLAY_EX_EVAL}</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:dd.SSS} [%thread] %level : %message%n%ex{full, DISPLAY_EX_EVAL}</pattern>
 		</encoder>
 		
 	</appender>

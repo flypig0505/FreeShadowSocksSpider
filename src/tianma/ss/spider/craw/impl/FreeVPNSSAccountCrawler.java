@@ -18,6 +18,7 @@ import org.jsoup.select.Elements;
 import tianma.ss.spider.craw.AccountCrawler;
 import tianma.ss.spider.http.HttpClientsProxy;
 import tianma.ss.spider.model.Config;
+import tianma.ss.spider.util.TLog;
 import tianma.ss.spider.util.TextUtils;
 
 /**
@@ -57,17 +58,13 @@ public class FreeVPNSSAccountCrawler implements AccountCrawler {
 				configs.add(new Config(server, port, password, method, ""));
 			}
 
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
+			TLog.e("Craw ss accounts failed", e);
+		}  finally {
 			try {
 				httpClient.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				TLog.e("Close httpclient failed", e);
 			}
 		}
 		return configs;

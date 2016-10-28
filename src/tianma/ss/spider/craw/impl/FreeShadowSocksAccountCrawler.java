@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -18,6 +17,7 @@ import org.jsoup.select.Elements;
 import tianma.ss.spider.craw.AccountCrawler;
 import tianma.ss.spider.http.HttpClientsProxy;
 import tianma.ss.spider.model.Config;
+import tianma.ss.spider.util.TLog;
 import tianma.ss.spider.util.TextUtils;
 
 /**
@@ -57,17 +57,13 @@ public class FreeShadowSocksAccountCrawler implements AccountCrawler {
 				configs.add(new Config(server, port, password, method, ""));
 			}
 
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
-			e.printStackTrace();
+			TLog.e("Craw ss accounts failed", e);
 		} finally {
 			try {
 				httpClient.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				TLog.e("Close httpclient failed", e);
 			}
 		}
 		return configs;
