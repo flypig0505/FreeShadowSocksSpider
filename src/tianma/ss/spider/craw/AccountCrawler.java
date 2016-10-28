@@ -26,5 +26,11 @@ public interface AccountCrawler {
 	 * @return
 	 */
 	String getUrl();
+	
+	/**
+	 * 在当前网站爬取ShadowSocks账户时,是否需要使用代理
+	 * @return
+	 */
+	boolean proxyNeeded();
 
 }

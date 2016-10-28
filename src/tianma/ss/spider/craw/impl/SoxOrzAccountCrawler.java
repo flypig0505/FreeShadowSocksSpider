@@ -37,7 +37,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import tianma.ss.spider.craw.AccountCrawler;
+import tianma.ss.spider.craw.DefaultAccountCrawler;
 import tianma.ss.spider.http.CookieStoreManager;
 import tianma.ss.spider.model.Config;
 import tianma.ss.spider.model.SoxOrzAccount;
@@ -52,7 +52,7 @@ import tianma.ss.spider.util.TextUtils;
  * @author Tianma
  *
  */
-public class SoxOrzAccountCrawler implements AccountCrawler {
+public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 
 	public static final String ROOT_URL = "http://www.vwp123.com/user/";
 	public static final String HREF_PREFIX = "node_json.php";
@@ -181,6 +181,11 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 			nvps.add(new BasicNameValuePair("verify", ""));
 			httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 
+			if(proxyNeeded()) {
+				// Setting proxy
+				httpPost.setConfig(getShadowSocksProxy());
+			}
+			
 			SoxOrzLoginStatus loginStatus = httpClient.execute(httpPost, loginHandler, localContext);
 			if (loginStatus.getOk() == SoxOrzLoginStatus.OK_OKAY) {
 				cookieStoreManager.setCookieStore(cookieStore);
@@ -215,6 +220,10 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 			context.setCookieStore(cookieStore);
 
 			HttpGet httpGet = new HttpGet(ROOT_URL + "_checkin.php");
+			if(proxyNeeded()) {
+				// Setting proxy
+				httpGet.setConfig(getShadowSocksProxy());
+			}
 			HttpResponse response = httpClient.execute(httpGet, context);
 
 			HttpEntity entity = response.getEntity();
@@ -253,6 +262,10 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 			localContext.setCookieStore(cookieStore);
 
 			HttpGet httpGet = new HttpGet(ROOT_URL + "node.php");
+			if(proxyNeeded()) {
+				// Setting proxy
+				httpGet.setConfig(getShadowSocksProxy());
+			}
 
 			HttpResponse response = httpClient.execute(httpGet, localContext);
 			HttpEntity entity = response.getEntity();
@@ -297,6 +310,10 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 			JsonParser parser = new JsonParser();
 			for (String url : nodeUrls) {
 				HttpGet httpGet = new HttpGet(url);
+				if(proxyNeeded()) {
+					// Setting proxy
+					httpGet.setConfig(getShadowSocksProxy());
+				}
 				HttpResponse response = httpClient.execute(httpGet, context);
 				HttpEntity entity = response.getEntity();
 				String json = EntityUtils.toString(entity);
@@ -321,5 +338,10 @@ public class SoxOrzAccountCrawler implements AccountCrawler {
 	@Override
 	public String getUrl() {
 		return ROOT_URL;
+	}
+	
+	@Override
+	public boolean proxyNeeded() {
+		return true;
 	}
 }

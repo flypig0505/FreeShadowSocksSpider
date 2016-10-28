@@ -15,7 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import tianma.ss.spider.craw.AccountCrawler;
+import tianma.ss.spider.craw.DefaultAccountCrawler;
 import tianma.ss.spider.model.Config;
 import tianma.ss.spider.util.TLog;
 import tianma.ss.spider.util.TextUtils;
@@ -26,7 +26,7 @@ import tianma.ss.spider.util.TextUtils;
  * @author Tianma
  *
  */
-public class GetShadowSocksAccountCrawler implements AccountCrawler {
+public class GetShadowSocksAccountCrawler extends DefaultAccountCrawler {
 
 	private static String url = "http://getshadowsocks.com/";
 
@@ -37,6 +37,10 @@ public class GetShadowSocksAccountCrawler implements AccountCrawler {
 		try {
 
 			HttpGet httpGet = new HttpGet(url);
+			if(proxyNeeded()) {
+				// Setting proxy
+				httpGet.setConfig(getShadowSocksProxy());
+			}
 			HttpResponse response = httpClient.execute(httpGet);
 			HttpEntity entity = response.getEntity();
 			String html = EntityUtils.toString(entity, "utf-8");
