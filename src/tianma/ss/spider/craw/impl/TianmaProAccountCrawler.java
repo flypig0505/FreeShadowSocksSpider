@@ -8,6 +8,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,57 +16,55 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import tianma.ss.spider.craw.DefaultAccountCrawler;
-import tianma.ss.spider.http.HttpClientsProxy;
 import tianma.ss.spider.model.Config;
 import tianma.ss.spider.util.TLog;
-import tianma.ss.spider.util.TextUtils;
 
 /**
- * free shadowsocks 账户爬取
+ * tianma.pro 账户爬取
  * 
  * @author Tianma
  *
  */
-public class FreeShadowSocksAccountCrawler extends DefaultAccountCrawler {
+public class TianmaProAccountCrawler extends DefaultAccountCrawler {
 
-	// private static String url = "http://freeshadowsocks.cf/";
-	// private static String url = "http://freessr.cf/";
-	private static String url = "http://freessr.top/";
+	private static String url = "http://tianma.pro/free-shadowsocks-account/";
 
 	@Override
 	public List<Config> crawAccounts() {
 		List<Config> configs = new ArrayList<Config>();
-		CloseableHttpClient httpClient = HttpClientsProxy.createSSLClientDefault();
+		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			HttpGet httpGet = new HttpGet(url);
 			if (proxyNeeded()) {
-				// Setting proxy
+				// Setting Proxy
 				httpGet.setConfig(getShadowSocksProxy());
 			}
+
 			HttpResponse response = httpClient.execute(httpGet);
 			HttpEntity entity = response.getEntity();
 			String html = EntityUtils.toString(entity, "utf-8");
 			Document doc = Jsoup.parse(html);
-			Elements accounts = doc.getElementsByClass("col-md-6");
-			for (Element account : accounts) {
-				Elements eles = account.getElementsByTag("h4");
-				if (eles == null || eles.size() < 4)
+			Element tableEle = doc.getElementById("free-shadowsocks-account");
+			Elements trEles = tableEle.getElementsByTag("tr");
+			for (Element trEle : trEles) {
+				Elements eles = trEle.getElementsByTag("td");
+				if (eles == null || eles.isEmpty()) // <tr></tr>
 					continue;
 				int port = 0;
 				try {
-					port = Integer.parseInt(getString(eles.get(1).text()));
+					port = Integer.parseInt(eles.get(1).text());
 				} catch (Exception e) {
 					TLog.e(e);
 					continue;
 				}
-				String server = getString(eles.get(0).text());
-				String password = getString(eles.get(2).text());
-				String method = getString(eles.get(3).text());
+				String server = eles.get(0).text();
+				String password = eles.get(2).text();
+				String method = eles.get(3).text();
 				configs.add(new Config(server, port, password, method, ""));
 			}
 
 		} catch (Exception e) {
-			TLog.e("Craw ss accounts failed", e);
+			TLog.e(e);
 		} finally {
 			try {
 				httpClient.close();
@@ -74,13 +73,6 @@ public class FreeShadowSocksAccountCrawler extends DefaultAccountCrawler {
 			}
 		}
 		return configs;
-	}
-
-	private String getString(String str) {
-		if (TextUtils.isEmpty(str))
-			return null;
-		int index = str.indexOf(':');
-		return str.substring(index + 1);
 	}
 
 	@Override

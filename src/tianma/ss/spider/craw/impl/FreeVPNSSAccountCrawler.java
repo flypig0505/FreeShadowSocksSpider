@@ -38,7 +38,7 @@ public class FreeVPNSSAccountCrawler extends DefaultAccountCrawler {
 		CloseableHttpClient httpClient = HttpClientsProxy.createSSLClientDefault();
 		try {
 			HttpGet httpGet = new HttpGet(url);
-			if(proxyNeeded()) {
+			if (proxyNeeded()) {
 				// Setting proxy
 				httpGet.setConfig(getShadowSocksProxy());
 			}
@@ -63,7 +63,7 @@ public class FreeVPNSSAccountCrawler extends DefaultAccountCrawler {
 
 		} catch (Exception e) {
 			TLog.e("Craw ss accounts failed", e);
-		}  finally {
+		} finally {
 			try {
 				httpClient.close();
 			} catch (IOException e) {

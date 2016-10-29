@@ -25,6 +25,7 @@ import tianma.ss.spider.craw.impl.FreeVPNSSAccountCrawler;
 import tianma.ss.spider.craw.impl.GetShadowSocksAccountCrawler;
 import tianma.ss.spider.craw.impl.IShadowSocksAccountCrawler;
 import tianma.ss.spider.craw.impl.SoxOrzAccountCrawler;
+import tianma.ss.spider.craw.impl.TianmaProAccountCrawler;
 import tianma.ss.spider.model.Config;
 import tianma.ss.spider.model.SSProgramConfig;
 import tianma.ss.spider.model.ShadowSocksConfig;
@@ -49,6 +50,7 @@ public class ShadowSocksSpider {
 			this.add(new GetShadowSocksAccountCrawler());
 			this.add(new FreeShadowSocksAccountCrawler());
 			this.add(new SoxOrzAccountCrawler());
+			this.add(new TianmaProAccountCrawler());
 		}
 	};
 
@@ -103,7 +105,7 @@ public class ShadowSocksSpider {
 	 * @throws Exception
 	 */
 	public void start() {
-		TLog.i("----------------------------------Start----------------------------------");
+		TLog.i("---------------------------------Start---------------------------------");
 		List<Config> configs = new ArrayList<Config>();
 		for (AccountCrawler crawler : crawlers) {
 			TLog.i(crawler.getUrl());

@@ -38,7 +38,7 @@ public class IShadowSocksAccountCrawler extends DefaultAccountCrawler {
 		try {
 
 			HttpGet httpGet = new HttpGet(url);
-			if(proxyNeeded()) {
+			if (proxyNeeded()) {
 				// Setting proxy
 				httpGet.setConfig(getShadowSocksProxy());
 			}

@@ -187,14 +187,16 @@ public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 			}
 			
 			SoxOrzLoginStatus loginStatus = httpClient.execute(httpPost, loginHandler, localContext);
-			if (loginStatus.getOk() == SoxOrzLoginStatus.OK_OKAY) {
+			if (loginStatus == null){
+				TLog.e("访问拒绝,登录失败");
+			} else if (loginStatus.getOk() == SoxOrzLoginStatus.OK_OKAY) {
 				cookieStoreManager.setCookieStore(cookieStore);
 				return true;
 			} else {
-				TLog.i(loginStatus.getMsg());
+				TLog.e(loginStatus.getMsg());
 			}
 		} catch (IOException e) {
-			TLog.e("", e);
+			TLog.e(e);
 		} finally {
 			try {
 				httpClient.close();

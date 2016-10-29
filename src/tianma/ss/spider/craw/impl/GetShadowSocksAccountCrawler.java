@@ -37,7 +37,7 @@ public class GetShadowSocksAccountCrawler extends DefaultAccountCrawler {
 		try {
 
 			HttpGet httpGet = new HttpGet(url);
-			if(proxyNeeded()) {
+			if (proxyNeeded()) {
 				// Setting proxy
 				httpGet.setConfig(getShadowSocksProxy());
 			}
@@ -46,7 +46,7 @@ public class GetShadowSocksAccountCrawler extends DefaultAccountCrawler {
 			String html = EntityUtils.toString(entity, "utf-8");
 			Document doc = Jsoup.parse(html);
 			Elements sections = doc.getElementsByTag("section");
-			for (Element section: sections) {
+			for (Element section : sections) {
 				Elements eles = section.getElementsByTag("p");
 				int port = 0;
 				try {
@@ -70,7 +70,7 @@ public class GetShadowSocksAccountCrawler extends DefaultAccountCrawler {
 		}
 		return configs;
 	}
-	
+
 	private String getString(String str) {
 		if (TextUtils.isEmpty(str))
 			return null;
