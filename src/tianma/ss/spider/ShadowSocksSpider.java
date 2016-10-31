@@ -33,12 +33,15 @@ import tianma.ss.spider.util.TLog;
 import tianma.ss.spider.util.TextUtils;
 
 /**
- * This is a web crawler which can grab the related shadowsocks's node information.
+ * This is a web crawler which can grab the related shadowsocks's node
+ * information.
  * 
  * @author Tianma
  * @Date: 2016年1月5日 上午12:34:30
  */
 public class ShadowSocksSpider {
+
+	private static String projectURL = "https://github.com/tianma8023/FreeShadowSocksSpider";
 
 	private SSProgramConfig programConfig;
 
@@ -117,6 +120,11 @@ public class ShadowSocksSpider {
 			}
 			TLog.i("-----------------------------");
 		}
+		if (configs.isEmpty()) {
+			TLog.e("Sorry, all shadowsocks accounts are not availiable. Please try again later, or you can checkout the latest code from "
+					+ projectURL);
+			return;
+		}
 		// 判断当前Shadowsocks.exe是否正在运行
 		List<Integer> pids = getShadowSocksPidList();
 		boolean running = pids.size() > 0;
@@ -152,12 +160,14 @@ public class ShadowSocksSpider {
 		try {
 			ShadowSocksConfig ssConfig = gson.fromJson(new FileReader(configPath), ShadowSocksConfig.class);
 			ssConfig.setConfigs(configs);
+			// 可能的话需要修改index的值(对应ShadowSocks客户端选择那个ss节点)
+			ssConfig.setIndex(Math.min(ssConfig.getIndex(), configs.size() - 1));
 			String data = gson.toJson(ssConfig);
 			FileUtils.write(configPath, data);
 			result = true;
 		} catch (IOException e) {
 			TLog.e("Write to gui-config.json failed", e);
-		} 
+		}
 		return result;
 	}
 
@@ -192,7 +202,7 @@ public class ShadowSocksSpider {
 			}
 		} catch (IOException e) {
 			TLog.e("Get ShadowSocks.exe's process ID failed", e);
-		}  finally {
+		} finally {
 			if (p != null)
 				p.destroy();
 		}
