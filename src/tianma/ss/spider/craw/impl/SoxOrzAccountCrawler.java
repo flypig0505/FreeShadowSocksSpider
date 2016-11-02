@@ -124,7 +124,6 @@ public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 
 	@Override
 	public List<Config> crawAccounts() {
-		TLog.i(ROOT_URL);
 		boolean needSpiltLine = false;
 		boolean needParse = false; // 是否有必要继续解析
 
