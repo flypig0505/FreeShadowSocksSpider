@@ -29,11 +29,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -54,8 +52,16 @@ import tianma.ss.spider.util.TextUtils;
  */
 public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 
-	public static final String ROOT_URL = "http://www.vwp123.com/user/";
-	public static final String HREF_PREFIX = "node_json.php";
+	private static final String ROOT_URL = "http://www.vwp123.com";
+
+	/** login action */
+	private static final String ACTION_LOGIN = "/auth/login";
+	/** check in action */
+	private static final String ACTION_CHECK_IN = "/user/checkin";
+	/** get node list action */
+	private static final String ACTION_NODE_LIST = "/user/node";
+	/** user home page */
+	private static final String ACTION_USER_HOME = "/user";
 
 	private CookieStoreManager cookieStoreManager;
 
@@ -124,16 +130,15 @@ public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 
 	@Override
 	public List<Config> crawAccounts() {
-		boolean needSpiltLine = false;
-		boolean needParse = false; // 是否有必要继续解析
+		boolean needSpliLine = false;
 
 		List<Config> configs = new ArrayList<Config>();
 
 		for (SoxOrzAccount account : accounts) {
-			if (needSpiltLine) {
+			if (needSpliLine) {
 				TLog.i("");
 			} else {
-				needSpiltLine = true;
+				needSpliLine = true;
 			}
 			TLog.i("Current email : " + account.getEmail());
 			// 登陆
@@ -142,16 +147,17 @@ public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 				TLog.i("Login Failed");
 				continue;
 			}
-			needParse = true;
 			TLog.i("Login Success");
 			// 签到
 			checkin();
-
-			if (needParse) {
-				List<String> urls = parseAllNodeUrl();
-				configs.addAll(parseAllConfigs(urls));
+			String[] portAndPwd = parsePortAndPwd();
+			if (portAndPwd != null) {
+				try{
+					configs = parseAllSSNodes(Integer.parseInt(portAndPwd[0]), portAndPwd[1]);
+				}catch(Exception e) {
+					TLog.e(e);
+				}
 			}
-
 		}
 		return configs;
 	}
@@ -172,23 +178,23 @@ public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 			HttpClientContext localContext = HttpClientContext.create();
 			localContext.setCookieStore(cookieStore);
 
-			HttpPost httpPost = new HttpPost(ROOT_URL + "_login.php");
+			HttpPost httpPost = new HttpPost(ROOT_URL + ACTION_LOGIN);
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			nvps.add(new BasicNameValuePair("email", account.getEmail()));
 			nvps.add(new BasicNameValuePair("passwd", account.getPassword()));
 			nvps.add(new BasicNameValuePair("remember_me", "false"));
-			nvps.add(new BasicNameValuePair("verify", ""));
+			nvps.add(new BasicNameValuePair("code", ""));
 			httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 
-			if(proxyNeeded()) {
+			if (proxyNeeded()) {
 				// Setting proxy
 				httpPost.setConfig(getShadowSocksProxy());
 			}
-			
+
 			SoxOrzLoginStatus loginStatus = httpClient.execute(httpPost, loginHandler, localContext);
-			if (loginStatus == null){
-				TLog.e("访问拒绝,登录失败");
-			} else if (loginStatus.getOk() == SoxOrzLoginStatus.OK_OKAY) {
+			if (loginStatus == null) {
+				TLog.e("Access refused, login failed");
+			} else if (loginStatus.getCode() == SoxOrzLoginStatus.OK_OKAY) {
 				cookieStoreManager.setCookieStore(cookieStore);
 				return true;
 			} else {
@@ -209,7 +215,7 @@ public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 	/**
 	 * 签到
 	 * 
-	 * @return true if check in, false if not.
+	 * @return true if checked in, false if not.
 	 */
 	public boolean checkin() {
 		boolean result = false;
@@ -220,12 +226,12 @@ public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 			HttpClientContext context = HttpClientContext.create();
 			context.setCookieStore(cookieStore);
 
-			HttpGet httpGet = new HttpGet(ROOT_URL + "_checkin.php");
-			if(proxyNeeded()) {
+			HttpPost httpPost = new HttpPost(ROOT_URL + ACTION_CHECK_IN);
+			if (proxyNeeded()) {
 				// Setting proxy
-				httpGet.setConfig(getShadowSocksProxy());
+				httpPost.setConfig(getShadowSocksProxy());
 			}
-			HttpResponse response = httpClient.execute(httpGet, context);
+			HttpResponse response = httpClient.execute(httpPost, context);
 
 			HttpEntity entity = response.getEntity();
 			String checkinJson = EntityUtils.toString(entity);
@@ -240,52 +246,13 @@ public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 				break;
 			}
 			if (hasDigit) {
-				TLog.i("签到成功," + msg);
+				TLog.i("Check in success: " + msg);
 			} else {
-				TLog.w("重复签到," + msg);
+				TLog.w("Check in repeated: " + msg);
 			}
+			result = true;
 		} catch (IOException e) {
-			TLog.e("签到失败", e);
-		}
-		return result;
-	}
-
-	/**
-	 * 爬取网页，获取对应的节点数据
-	 */
-	private List<String> parseAllNodeUrl() {
-		List<String> nodeUrls = new ArrayList<>();
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-		try {
-			CookieStore cookieStore = cookieStoreManager.getCookieStore();
-
-			HttpClientContext localContext = HttpClientContext.create();
-			localContext.setCookieStore(cookieStore);
-
-			HttpGet httpGet = new HttpGet(ROOT_URL + "node.php");
-			if(proxyNeeded()) {
-				// Setting proxy
-				httpGet.setConfig(getShadowSocksProxy());
-			}
-
-			HttpResponse response = httpClient.execute(httpGet, localContext);
-			HttpEntity entity = response.getEntity();
-			String html = EntityUtils.toString(entity);
-
-			Document doc = Jsoup.parse(html);
-			Elements eleList = doc.getElementsByClass("dropdown-menu");
-			for (Element ele : eleList) {
-				Elements eleList2 = ele.getElementsByTag("a");
-				for (Element element : eleList2) {
-					String href = element.attr("href");
-					if (!TextUtils.isBlank(href) && href.startsWith(HREF_PREFIX)) {
-						String nodeUrl = ROOT_URL + href;
-						nodeUrls.add(nodeUrl);
-					}
-				}
-			}
-		} catch (IOException e) {
-			TLog.e("Parse all node url failed", e);
+			TLog.e("Check in failed", e);
 		} finally {
 			try {
 				httpClient.close();
@@ -293,14 +260,15 @@ public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 				TLog.e("Close httpclient failed", e);
 			}
 		}
-		return nodeUrls;
+		return result;
 	}
 
 	/**
-	 * 解析所有的Url对应的Config对象,并以List的形式返回
+	 * 解析出ss账户的端口和密码，以数组形式返回， s[0]: port, s[1]: password，解析失败则返回null
+	 * 
+	 * @return
 	 */
-	private List<Config> parseAllConfigs(List<String> nodeUrls) {
-		List<Config> configs = new ArrayList<Config>();
+	private String[] parsePortAndPwd() {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
 			CookieStore cookieStore = cookieStoreManager.getCookieStore();
@@ -308,39 +276,101 @@ public class SoxOrzAccountCrawler extends DefaultAccountCrawler {
 			HttpClientContext context = HttpClientContext.create();
 			context.setCookieStore(cookieStore);
 
-			JsonParser parser = new JsonParser();
-			for (String url : nodeUrls) {
-				HttpGet httpGet = new HttpGet(url);
-				if(proxyNeeded()) {
+			HttpGet httpGet = new HttpGet(ROOT_URL + ACTION_USER_HOME);
+			if (proxyNeeded()) {
+				// Setting proxy
+				httpGet.setConfig(getShadowSocksProxy());
+			}
+			HttpResponse response = httpClient.execute(httpGet, context);
+			HttpEntity entity = response.getEntity();
+			String html = EntityUtils.toString(entity);
+
+			Document doc = Jsoup.parse(html);
+			Elements eles = doc.select("dl.dl-horizontal:contains(端口) > dd");
+			if (eles.size() >= 2) {
+				String[] result = new String[2];
+				for (int i = 0; i < 2; i++) {
+					result[i] = eles.get(i).text();
+				}
+				TLog.i("Parse port and password success");
+				return result;
+			}
+		} catch (IOException e) {
+			TLog.e(e);
+		} finally {
+			try {
+				httpClient.close();
+			} catch (IOException e) {
+				TLog.e("Close httpclient failed", e);
+			}
+		}
+		TLog.i("Parse port and password failed");
+		return null;
+	}
+	
+	/**
+	 * 解析所有的Url对应的Config对象,并以List的形式返回
+	 */
+	private List<Config> parseAllSSNodes(int port, String password) {
+		List<Config> configs = new ArrayList<Config>();
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		try {
+			CookieStore cookieStore = cookieStoreManager.getCookieStore();
+
+			HttpClientContext context = HttpClientContext.create();
+			context.setCookieStore(cookieStore);
+			
+				HttpGet httpGet = new HttpGet(ROOT_URL + ACTION_NODE_LIST);
+				if (proxyNeeded()) {
 					// Setting proxy
 					httpGet.setConfig(getShadowSocksProxy());
 				}
 				HttpResponse response = httpClient.execute(httpGet, context);
 				HttpEntity entity = response.getEntity();
-				String json = EntityUtils.toString(entity);
-				JsonElement ele = parser.parse(json);
-				JsonObject jsonObject = ele.getAsJsonObject();
-				String server = jsonObject.get("server").getAsString();
-				if (TextUtils.isBlank(server)) {
-					continue;
+				String html = EntityUtils.toString(entity);
+				Document doc = Jsoup.parse(html);
+				
+				Elements servers = doc.select("p:contains(地址：)");
+				Elements methods = doc.select("p:contains(加密方式：)");
+				
+				if(servers == null) {
+					TLog.e("Parse ss server list failed");
+				} else if (methods == null) {
+					TLog.e("Parse ss method list failed");
+				} else if (servers.size() != methods.size()) {
+					TLog.e("SS server list don't match method list");
+				} else {
+					for(int i = 0; i < servers.size(); i++) {
+						String server = getString(servers.get(i).text());
+						String method = getString(methods.get(i).text());
+						if (server == null || method == null) {
+							TLog.e("server or method is empty");
+						} else {
+							configs.add(new Config(server, port, password, method, ""));
+						}
+					}
 				}
-				int server_port = jsonObject.get("server_port").getAsInt();
-				String password = jsonObject.get("password").getAsString();
-				String method = jsonObject.get("method").getAsString();
-				configs.add(new Config(server, server_port, password, method, ""));
-			}
-
 		} catch (IOException e) {
-			TLog.e("Parse all configs failed", e);
+			TLog.e("Parse all ss configs failed", e);
 		}
 		return configs;
 	}
 
+	private String getString(String str) {
+		if (TextUtils.isEmpty(str))
+			return null;
+		int index = str.indexOf('：');
+		if (index != -1){
+			return str.substring(index + 1).trim();
+		}
+		return str.trim();
+	}
+	
 	@Override
 	public String getUrl() {
 		return ROOT_URL;
 	}
-	
+
 	@Override
 	public boolean proxyNeeded() {
 		return true;

@@ -1,5 +1,12 @@
 package tianma.ss.spider.model;
 
+import com.google.gson.annotations.SerializedName;
+
+/**
+ * SoxOrz Login Status.
+ * @author Tianma
+ *
+ */
 public class SoxOrzLoginStatus {
 
 	// {"code":"1","ok":"1","msg":"\u6b22\u8fce\u56de\u6765"}
@@ -9,28 +16,24 @@ public class SoxOrzLoginStatus {
 	 */
 	public static final int OK_OKAY = 1;
 
+	@SerializedName("ret")
 	private int code;
-	private int ok;
+	@SerializedName("msg")
 	private String msg;
+	
+	public SoxOrzLoginStatus() {
+	}
 
 	public int getCode() {
 		return code;
-	}
-
-	public int getOk() {
-		return ok;
 	}
 
 	public String getMsg() {
 		return msg;
 	}
 
-	public SoxOrzLoginStatus() {
-	}
-
 	@Override
 	public String toString() {
-		return "LoginStatus [code=" + code + ", ok=" + ok + ", msg=" + msg + "]";
+		return "SoxOrzLoginStatus [code=" + code + ", msg=" + msg + "]";
 	}
-
 }
