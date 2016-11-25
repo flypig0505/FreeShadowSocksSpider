@@ -1,4 +1,4 @@
 *.class
 .settings/
-*.project
 /bin/
+/libsrc/
