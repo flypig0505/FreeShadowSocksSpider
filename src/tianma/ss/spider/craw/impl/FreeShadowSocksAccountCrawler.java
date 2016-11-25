@@ -31,6 +31,11 @@ public class FreeShadowSocksAccountCrawler extends DefaultAccountCrawler {
 	// private static String url = "http://freeshadowsocks.cf/";
 	// private static String url = "http://freessr.cf/";
 	private static String url = "http://freessr.top/";
+	
+	// ss node state 
+	private static final int NORMAL = 0;
+	private static final int ABNORMAL = 1;
+	
 
 	@Override
 	public List<Config> crawAccounts() {
@@ -54,6 +59,8 @@ public class FreeShadowSocksAccountCrawler extends DefaultAccountCrawler {
 				int port = 0;
 				try {
 					port = Integer.parseInt(getString(eles.get(1).text()));
+					if (getState(getString(eles.get(4).text())) == ABNORMAL) // SS node abnormal
+						continue;
 				} catch (Exception e) {
 					TLog.e(e);
 					continue;
@@ -81,6 +88,13 @@ public class FreeShadowSocksAccountCrawler extends DefaultAccountCrawler {
 			return null;
 		int index = str.indexOf(':');
 		return str.substring(index + 1);
+	}
+	
+	private int getState(String str) {
+		String stateStr = getString(str);
+		if ("正常".equals(stateStr))
+			return NORMAL;
+		return ABNORMAL;
 	}
 
 	@Override

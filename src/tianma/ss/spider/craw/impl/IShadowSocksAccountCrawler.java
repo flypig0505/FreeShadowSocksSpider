@@ -46,8 +46,7 @@ public class IShadowSocksAccountCrawler extends DefaultAccountCrawler {
 			HttpEntity entity = response.getEntity();
 			String html = EntityUtils.toString(entity, "utf-8");
 			Document doc = Jsoup.parse(html);
-			Element freeEle = doc.getElementById("free");
-			Elements accounts = freeEle.getElementsByClass("col-sm-4");
+			Elements accounts = doc.select("#free .col-sm-4"); // 查找id=free元素下的class='col-sm-4'的所有子元素
 			for (Element account : accounts) {
 				Elements eles = account.getElementsByTag("h4");
 				int port = 0;

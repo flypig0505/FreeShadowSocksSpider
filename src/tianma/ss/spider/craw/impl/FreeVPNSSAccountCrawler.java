@@ -46,21 +46,20 @@ public class FreeVPNSSAccountCrawler extends DefaultAccountCrawler {
 			HttpEntity entity = response.getEntity();
 			String html = EntityUtils.toString(entity, "utf-8");
 			Document doc = Jsoup.parse(html);
-			Elements accounts = doc.getElementsByClass("panel-body");
+			Elements accounts = doc.select("div.panel-body");
 			for (Element account : accounts) {
-				Elements eles = account.getElementsByTag("p");
-				int port = 0;
-				try {
-					port = Integer.parseInt(getString(eles.get(1).text()));
-				} catch (Exception ignore) {
-					continue;
-				}
-				String server = getString(eles.get(0).text());
-				String password = getString(eles.get(2).text());
-				String method = getString(eles.get(3).text());
-				configs.add(new Config(server, port, password, method, ""));
+			Elements eles = account.getElementsByTag("p");
+			int port = 0;
+			try {
+				port = Integer.parseInt(getString(eles.get(1).text()));
+			} catch (Exception ignore) {
+				continue;
 			}
-
+			String server = getString(eles.get(0).text());
+			String password = getString(eles.get(2).text());
+			String method = getString(eles.get(3).text());
+			configs.add(new Config(server, port, password, method, ""));
+		}
 		} catch (Exception e) {
 			TLog.e("Craw ss accounts failed", e);
 		} finally {
@@ -87,7 +86,7 @@ public class FreeVPNSSAccountCrawler extends DefaultAccountCrawler {
 
 	@Override
 	public boolean proxyNeeded() {
-		return true;
+		return false;
 	}
 
 }

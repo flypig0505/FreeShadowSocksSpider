@@ -44,8 +44,9 @@ public class TianmaProAccountCrawler extends DefaultAccountCrawler {
 			HttpEntity entity = response.getEntity();
 			String html = EntityUtils.toString(entity, "utf-8");
 			Document doc = Jsoup.parse(html);
-			Element tableEle = doc.getElementById("free-shadowsocks-account");
-			Elements trEles = tableEle.getElementsByTag("tr");
+			// Element tableEle = doc.getElementById("free-shadowsocks-account");
+			// Elements trEles = tableEle.getElementsByTag("tr");
+			Elements trEles = doc.select("#free-shadowsocks-account tr");
 			for (Element trEle : trEles) {
 				Elements eles = trEle.getElementsByTag("td");
 				if (eles == null || eles.isEmpty()) // <tr></tr>
