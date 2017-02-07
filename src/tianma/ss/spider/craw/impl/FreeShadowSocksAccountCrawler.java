@@ -30,7 +30,7 @@ public class FreeShadowSocksAccountCrawler extends DefaultAccountCrawler {
 
 	// private static String url = "http://freeshadowsocks.cf/";
 	// private static String url = "http://freessr.cf/";
-	private static String url = "http://freessr.top/";
+	private static String url = "https://freessr.xyz/";
 	
 	// ss node state 
 	private static final int NORMAL = 0;

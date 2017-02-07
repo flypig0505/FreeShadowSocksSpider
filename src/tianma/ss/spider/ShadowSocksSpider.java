@@ -118,7 +118,7 @@ public class ShadowSocksSpider {
 			} else {
 				configs.addAll(newConfigs);
 			}
-			TLog.i("-----------------------------");
+			TLog.i("------------------------------------------------------------------");
 		}
 		if (configs.isEmpty()) {
 			TLog.e("Sorry, all shadowsocks accounts are not availiable. Please try again later, or you can checkout the latest code from "

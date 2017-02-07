@@ -27,7 +27,7 @@ import tianma.ss.spider.util.TLog;
  */
 public class TianmaProAccountCrawler extends DefaultAccountCrawler {
 
-	private static String url = "http://tianma.pro/free-shadowsocks-account/";
+	private static String url = "http://tianma.pro/post/402cab53/";
 
 	@Override
 	public List<Config> crawAccounts() {
